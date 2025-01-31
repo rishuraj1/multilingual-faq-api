@@ -8,7 +8,6 @@ const languages = [
   "kn", // Kannada
   "ml", // Malayalam
   "mr", // Marathi
-  "pa", // Punjabi
   "ta", // Tamil,
   "te", // Telugu
   "ur", // Urdu
@@ -17,7 +16,6 @@ const languages = [
   "ru", // Russian
   "fa", // Persian
   "ja", // Japanese
-  "zh", // Chinese
 ];
 
 export default languages;

@@ -1,11 +1,15 @@
-import redisClient from "../config/redis.js";
-import { createFAQService, getFAQService } from "../services/faq.services.js";
+import { setCache, removeCache } from "../services/cacheService.js";
+import { createFAQService, deleteFAQService, getFAQService, updateFAQService } from "../services/faq.services.js";
 
 const createFAQ = async (req, res) => {
   try {
     const { question, answer } = req.body;
     await createFAQService(question, answer);
-    return res.status(201).send("FAQ created successfully");
+    await removeCache();
+    return res.status(201).json({
+      message: "FAQ created successfully",
+      data: null,
+    });
   } catch (error) {
     res.status(400).send(error);
   }
@@ -15,13 +19,44 @@ const getFAQs = async (req, res) => {
   try {
     const { lang = "en" } = req.query;
     const faqs = await getFAQService(lang);
-    await redisClient.set(`faq_${lang}`, JSON.stringify(faqs), {
-      EX: 3600,
+    await setCache(`faq_${lang}`, faqs);
+    return res.status(200).json({
+      message: "FAQs fetched successfully",
+      data: faqs,
     });
-    return res.status(200).json(JSON.parse(JSON.stringify(faqs)));
   } catch (error) {
-    res.status(400).send(error);
+    console.warn(error);
+    res.status(400).json({ error, message: "Failed to fetch FAQs" });
   }
 };
 
-export { createFAQ, getFAQs };
+const updateFAQ = async (req, res) => {
+  try {
+    const { id, question, answer } = req.body;
+    await updateFAQService(id, question, answer);
+    await removeCache();
+    return res.status(200).json({
+      message: "FAQ updated successfully",
+      data: null,
+    });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+}
+
+const deleteFAQ = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await deleteFAQService(id)
+    await removeCache()
+    return res.status(200).json({
+      message: "FAQ deleted successfully",
+      data: null
+    })
+  } catch (error) {
+    console.warn(error)
+    res.status(400).send(error)
+  }
+}
+
+export { createFAQ, getFAQs, updateFAQ, deleteFAQ };
