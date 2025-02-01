@@ -6,13 +6,26 @@ The objective of this project is to create a multilingual FAQ management system 
 
 ## Features
 
-- Support for WYSIWYG editor for formatting and creating answers.
-- REST API for managing FAQs with language selection.
-- Caching mechanism for improved performance.
-- Multi-language translation support using Google Translate API.
-- User-friendly admin interface for managing FAQs.
-- Unit tests and code quality checks.
-- Detailed documentation and proper Git commit messages.
+- **Create**, **Retrieve**, **Update**, and **Delete** FAQs.
+- **Support for multiple languages**: Translations are handled automatically via the **Google Translate API**.
+- **Caching mechanism** using **Redis** for faster responses.
+- **WYSIWYG support** for formatting FAQ answers using **Quill.js**.
+- **REST API** for interacting with FAQ data.
+- **Admin panel** for easy management of FAQs.
+- **Filtering FAQs by language**.
+- **Docker support** for easy deployment.
+- **Unit testing** using **Jest** and **Supertest**.
+- Follows best practices for code quality, testing, and commit messages.
+
+## Tech Stack
+
+- **Node.js**: Backend JavaScript runtime.
+- **Express**: Web framework for building RESTful APIs.
+- **Mongoose**: ORM for interacting with the MongoDB database.
+- **Redis**: Caching for translations to improve performance.
+- **Google Translate API**: For automatic translation of FAQ content.
+- **Quill.js**: WYSIWYG editor for rich text formatting.
+- **Jest & Supertest**: For writing and running tests.
 
 ## Installation
 
