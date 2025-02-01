@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FAQ Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.quilljs.com/1.3.6/quill.snow.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-50 min-h-screen flex flex-col items-center py-10">
+    <header class="w-full bg-white shadow-md p-4 text-center">
+      <a
+        href="./allFaqs.html"
+        class="text-blue-600 hover:text-blue-700 font-semibold"
+        >ALL FAQs</a
+      >
+    </header>
+
+    <div class="bg-white shadow-md rounded-lg p-6 w-full max-w-2xl mt-6">
+      <h1 class="text-2xl font-bold text-gray-900 mb-4">FAQ Editor</h1>
+      <div class="mb-4">
+        <label for="question" class="block text-gray-700 font-medium"
+          >Question:</label
+        >
+        <input
+          type="text"
+          id="question"
+          placeholder="Enter your question"
+          class="w-full p-3 mt-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        />
+      </div>
+      <div class="mb-4">
+        <label for="editor" class="block text-gray-700 font-medium"
+          >Answer:</label
+        >
+        <div id="editor" class="border border-gray-300 rounded-md h-64"></div>
+      </div>
+      <button
+        id="submitButton"
+        onclick="submitFAQ()"
+        class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-md flex items-center justify-center"
+      >
+        Create FAQ
+        <span
+          id="spinner"
+          class="hidden ml-2 w-5 h-5 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"
+        ></span>
+      </button>
+    </div>
+
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script>
+      const quill = new Quill("#editor", {
+        theme: "snow",
+        modules: {
+          toolbar: [
+            ["bold", "italic", "underline", "strike"],
+            ["blockquote", "code-block"],
+            [{ header: 1 }, { header: 2 }],
+            [{ list: "ordered" }, { list: "bullet" }],
+            [{ script: "sub" }, { script: "super" }],
+            [{ indent: "-1" }, { indent: "+1" }],
+            ["link", "image"],
+            ["clean"],
+          ],
+        },
+      });
+
+      async function submitFAQ() {
+        const submitButton = document.getElementById("submitButton");
+        const spinner = document.getElementById("spinner");
+        const question = document.getElementById("question").value;
+        const answer = quill.root.innerHTML;
+
+        if (!question || !answer) {
+          alert("Please fill in both question and answer fields");
+          return;
+        }
+
+        try {
+          submitButton.disabled = true;
+          spinner.classList.remove("hidden");
+
+          const response = await fetch("http://localhost:8000/api/faqs", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ question, answer }),
+          });
+
+          const data = await response.json();
+          if (response.ok) {
+            alert("FAQ created successfully!");
+            document.getElementById("question").value = "";
+            quill.setText("");
+            window.location.href = "./allFaqs.html";
+          } else {
+            alert("Error creating FAQ: " + data.message);
+          }
+        } catch (error) {
+          alert("Error creating FAQ: " + error.message);
+        } finally {
+          submitButton.disabled = false;
+          spinner.classList.add("hidden");
+        }
+      }
+    </script>
+  </body>
+</html>
