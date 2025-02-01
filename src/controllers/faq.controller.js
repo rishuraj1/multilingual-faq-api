@@ -49,7 +49,7 @@ const deleteFAQ = async (req, res) => {
     const { id } = req.params;
     await deleteFAQService(id)
     await removeCache()
-    return res.status(200).json({
+    return res.status(204).json({
       message: "FAQ deleted successfully",
       data: null
     })
