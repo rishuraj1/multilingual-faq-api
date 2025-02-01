@@ -76,11 +76,3 @@ curl http://localhost:8000/api/faqs/?lang=hi
 ```bash
 curl http://localhost:8000/api/faqs/?lang=bn
 ```
-
-## Screenshots
-
-- ![alt text](image.png)
-
-- ![alt text](image-1.png)
-
-- ![alt text](image-2.png)
