@@ -19,13 +19,17 @@ const getFAQService = async (lang = "en") => {
 
 const createFAQService = async (question, answer) => {
   const translations = {
-    questions: new Map(),
-    answers: new Map(),
+    questions: {},
+    answers: {},
   };
-  languages.forEach(async (lang) => {
-    translations.questions.set(lang, await translateText(question, lang));
-    translations.answers.set(lang, await translateText(answer, lang));
-  });
+
+  await Promise.all(
+    languages.map(async (lang) => {
+      translations.questions[lang] = await translateText(question, lang);
+      translations.answers[lang] = await translateText(answer, lang);
+    })
+  );
+
   const faq = new FAQ({ question, answer, translations });
   await faq.save();
   return faq;
