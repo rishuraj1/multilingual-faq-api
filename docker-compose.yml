@@ -2,11 +2,10 @@ version: "3.9"
 
 services:
   app:
-    image: node:22
-    container_name: node_app
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: node_app
     ports:
       - "8000:8000"
     environment:
@@ -20,6 +19,14 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      retries: 3
+      start_period: 5s
+      timeout: 10s
 
   mongo:
     image: mongo:latest
@@ -28,6 +35,14 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.runCommand('ping')"]
+      interval: 30s
+      retries: 3
+      start_period: 5s
+      timeout: 10s
 
   redis:
     image: redis:latest
@@ -36,9 +51,21 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      retries: 3
+      start_period: 5s
+      timeout: 10s
 
 volumes:
   mongodb_data:
     driver: local
   redis_data:
     driver: local
+
+networks:
+  app-network:
+    driver: bridge

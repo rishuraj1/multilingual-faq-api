@@ -1,20 +1,23 @@
-# Base image
-FROM node:22
+FROM node:22 AS build
 
-# Set the working directory
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+RUN npm ci --only=production
 
-# Copy the entire project
 COPY . .
 
-# Expose the app port
-EXPOSE 8000
+FROM node:22 AS production
 
-# Run the application
+WORKDIR /usr/src/app
+
+COPY --from=build /usr/src/app /usr/src/app
+
+# Install runtime dependencies (if any)
+# RUN npm install --only=production
+
+RUN groupadd -r app && useradd -r -g app app
+USER app
+EXPOSE 8000
 CMD ["npm", "start"]
