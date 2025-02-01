@@ -41,15 +41,19 @@ const updateFAQService = async (id, question, answer) => {
     throw new Error("FAQ not found");
   }
   const translations = {
-    questions: new Map(),
-    answers: new Map(),
+    questions: {},
+    answers: {},
   };
-  for (const lang of languages) {
-    translations.questions.set(lang, await translateText(question, lang));
-    translations.answers.set(lang, await translateText(answer, lang));
-  }
+  await Promise.all(
+    languages.map(async (lang) => {
+      translations.questions[lang] = await translateText(question, lang);
+      translations.answers[lang] = await translateText(answer, lang);
+    })
+  );
+
   faq.question = question;
   faq.answer = answer;
+  faq.translations = translations;
   await faq.save();
   return faq;
 };

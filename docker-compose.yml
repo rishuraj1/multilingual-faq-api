@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   app:
-    image: node:22  # Use a Node.js base image (replace '22' with your version)
+    image: node:22
     container_name: node_app
     build:
       context: .
@@ -11,7 +11,7 @@ services:
       - "8000:8000"
     environment:
       NODE_ENV: development
-      MONGO_URI: mongodb+srv://rrishu561:qPj5gqHUI0zYbW8J@multiligual-faq.rdm43.mongodb.net/ # MongoDB connection string
+      MONGO_URI: ${MONGO_URI}
       REDIS_HOST: redis
       REDIS_PORT: 6379
     depends_on:
@@ -22,23 +22,20 @@ services:
       - /usr/src/app/node_modules
 
   mongo:
-    image: mongo:6.0
+    image: mongo:latest
     container_name: mongodb
     ports:
-      - "27017:27017" # MongoDB default port
+      - "27017:27017"
     volumes:
-      - mongodb_data:/data/db # Persistent MongoDB storage
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      - mongodb_data:/data/db
 
   redis:
-    image: redis:7
+    image: redis:latest
     container_name: redis
     ports:
-      - "6379:6379" # Redis default port
+      - "6379:6379"
     volumes:
-      - redis_data:/data # Persistent Redis storage
+      - redis_data:/data
 
 volumes:
   mongodb_data:
