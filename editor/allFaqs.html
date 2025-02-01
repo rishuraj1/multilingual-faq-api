@@ -7,18 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-gray-50 min-h-screen">
-    <!-- Header -->
-    <header class="bg-white border-b">
-      <nav class="max-w-5xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-        <a
-          href="index.html"
-          class="text-xl font-medium text-blue-600 hover:text-blue-700 transition"
-        >
-          FAQ Editor
-        </a>
-      </nav>
-    </header>
-
     <!-- Main Content -->
     <main class="max-w-3xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
@@ -29,7 +17,7 @@
           href="./index.html"
           class="text-blue-600 hover:text-blue-700 transition"
         >
-          ← Back to editor
+          Create a new FAQ
         </a>
       </div>
 
@@ -102,7 +90,6 @@
     </div>
 
     <script>
-      // Language configuration
       const languages = [
         { code: "en", name: "English" },
         { code: "hi", name: "Hindi" },
@@ -123,20 +110,24 @@
         { code: "ja", name: "Japanese" },
       ];
 
-      // Modal elements
       const editModal = document.getElementById("editModal");
       const editForm = document.getElementById("editForm");
       const editFaqId = document.getElementById("editFaqId");
       const editQuestion = document.getElementById("editQuestion");
       const editAnswer = document.getElementById("editAnswer");
 
-      // Get current language from URL or default to 'en'
       function getCurrentLanguage() {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get("lang") || "en";
       }
 
-      // Create language buttons
+
+      function updateLanguageURL(langCode) {
+        const url = new URL(window.location.href);
+        url.searchParams.set("lang", langCode);
+        window.history.pushState({}, "", url.toString());
+      }
+
       function createLanguageButtons() {
         const container = document.getElementById("language-buttons");
         const currentLang = getCurrentLanguage();
@@ -165,10 +156,29 @@
             );
           }
 
-          button.addEventListener("click", () => {
-            const url = new URL(window.location.href);
-            url.searchParams.set("lang", lang.code);
-            window.location.replace(url.toString());
+          button.addEventListener("click", async () => {
+            updateLanguageURL(lang.code);
+            document
+              .querySelectorAll("#language-buttons button")
+              .forEach((btn) => {
+                btn.classList.remove("bg-blue-600", "text-white");
+                btn.classList.add(
+                  "bg-white",
+                  "text-gray-700",
+                  "hover:bg-gray-50",
+                  "border",
+                  "border-gray-200"
+                );
+              });
+            button.classList.remove(
+              "bg-white",
+              "text-gray-700",
+              "hover:bg-gray-50",
+              "border",
+              "border-gray-200"
+            );
+            button.classList.add("bg-blue-600", "text-white");
+            await loadFAQs();
           });
 
           container.appendChild(button);
@@ -219,7 +229,6 @@
       async function loadFAQs() {
         const faqList = document.getElementById("faq-list");
         const currentLang = getCurrentLanguage();
-        let isLoading = true;
 
         faqList.innerHTML =
           "<p class='text-center text-gray-500 py-8'>Loading FAQs...</p>";
@@ -232,14 +241,6 @@
             throw new Error(`HTTP error! Status: ${response.status}`);
 
           const faqs = await response.json();
-          isLoading = false;
-
-          setTimeout(() => {
-            if (isLoading) {
-              faqList.innerHTML =
-                "<p class='text-center text-gray-500 py-8'>Loading is taking longer than expected...</p>";
-            }
-          }, 2000);
 
           if (!Array.isArray(faqs) || faqs?.length === 0) {
             faqList.innerHTML =
@@ -343,7 +344,7 @@
 
               try {
                 const response = await fetch(
-                  `http://localhost:8000/api/faqs/${faq.id}`,
+                  `http://localhost:8000/api/faqs/${faq._id}`,
                   {
                     method: "DELETE",
                     headers: { "Content-Type": "application/json" },
@@ -382,11 +383,9 @@
                         </div>`;
         }
       }
-
-      // Initialize on page load
       document.addEventListener("DOMContentLoaded", async () => {
         createLanguageButtons();
-        loadFAQs();
+        await loadFAQs();
       });
     </script>
   </body>
